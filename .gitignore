@@ -35,4 +35,8 @@ blog-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore all .md files
 *.md
+
+# Except for README.md
+!README.md
