@@ -31,3 +31,8 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Custom Config for test
+config :blog,
+  profile_file_path: "test/blog/storage/test-md/profile.md",
+  posts_dir_path: "test/blog/storage//test-md/posts/"

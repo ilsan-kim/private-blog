@@ -1,11 +1,11 @@
 defmodule BlogWeb.ProfileLive do
   use BlogWeb, :live_view
 
-  alias Blog.Filesystem.LocalFilesystem
+  alias Blog.Storage.LocalFilesystem
 
   def mount(_params, _session, socket) do
     md =
-      LocalFilesystem.read!("profile.md")
+      LocalFilesystem.read_profile!()
       |> Earmark.as_html!(%Earmark.Options{
         code_class_prefix: "lang-",
         smartypants: false,
