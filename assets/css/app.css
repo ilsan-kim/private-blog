@@ -183,6 +183,7 @@ pre[class*="language-"]:after {
 .token.bold {
     font-weight: bold;
 }
+
 .token.italic {
     font-style: italic;
 }
@@ -222,10 +223,12 @@ pre[class*="language-"][data-line] {
     padding-bottom: 0;
     padding-left: 0;
 }
+
 pre[data-line] code {
     position: relative;
     padding-left: 4em;
 }
+
 pre .line-highlight {
     margin-top: 0;
 }
@@ -241,10 +244,10 @@ body {
 header {
     background: linear-gradient(
         to right,
-        #195099 15%,
-        #f6fafa 15%,
-        #f6fafa 85%,
-        #e71f27 85%
+        #195099 40%,
+        #f6fafa 40%,
+        #f6fafa 60%,
+        #e71f27 60%
     );
     color: white;
     padding: 10px 0;
@@ -308,12 +311,18 @@ nav ul li a:hover {
 
 .profile-content blockquote {
     font-size: 25px;
-    background-color: #dce7f7; /* 배경색 설정 */
-    border-radius: 30px; /* 모서리 둥글게 설정 */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
-    padding: 15px; /* 안쪽 여백 추가 */
-    margin: 15px 0; /* 바깥쪽 여백 추가 */
-    border-left: 5px solid #a4b8d1; /* 왼쪽 테두리 강조 */
+    background-color: #dce7f7;
+    /* 배경색 설정 */
+    border-radius: 30px;
+    /* 모서리 둥글게 설정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    /* 그림자 효과 추가 */
+    padding: 15px;
+    /* 안쪽 여백 추가 */
+    margin: 15px 0;
+    /* 바깥쪽 여백 추가 */
+    border-left: 5px solid #a4b8d1;
+    /* 왼쪽 테두리 강조 */
 }
 
 .profile-content p {
@@ -329,5 +338,66 @@ nav ul li a:hover {
 @media screen and (max-width: 768px) {
     .profile-content-container {
         padding: 0 10%;
+    }
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2열 그리드 */
+    grid-gap: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.posts-post {
+    border: 1px solid #ddd;
+    padding: 15px;
+    flex: 1;
+    margin: 0 10px;
+    max-width: 350px; /* 최대 너비 설정 */
+    max-height: 300px; /* 최대 높이 설정 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+}
+
+.posts-post h2 {
+    font-size: 1.2em;
+    margin: 0;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 최대 3줄 표시 */
+    -webkit-box-orient: vertical;
+}
+
+.posts-post p {
+    margin: 0;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 최대 3줄 표시 */
+    -webkit-box-orient: vertical;
+}
+
+.posts-image {
+    width: 160px;
+    height: 160px;
+    margin-left: 20px;
+}
+
+/* 모바일 환경 대응 */
+@media (max-width: 600px) {
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+    .posts-post {
+        margin: 10px auto; /* 수정: 상하 마진 유지, 좌우 마진으로 가운데 정렬 */
+        flex: 0 0 auto; /* 추가: flex 아이템의 크기가 자동으로 조정되도록 설정 */
+    }
+
+    .posts-image {
+        width: 100%;
+        height: auto;
     }
 }

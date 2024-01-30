@@ -1,0 +1,7 @@
+<div class="posts-grid">
+  <!-- 첫 번째 행 -->
+  <%= for i <- 0..length(@posts)-1 do %>
+    <.post_row post={post_at(@posts, i)} />
+  <% end %>
+  <!-- 추가 행 -->
+</div>

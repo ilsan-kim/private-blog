@@ -9,9 +9,17 @@ defmodule Blog.LocalFileSystemTest do
   end
 
   test "count_posts" do
-    b = Application.get_env(:blog, :posts_dir_path)
-    IO.inspect(b)
     count = LocalFilesystem.count_posts()
     assert count == 2
+  end
+
+  test "read!" do
+    post = LocalFilesystem.read_post("1.md")
+    assert post == "im 1.md\n"
+  end
+
+  test "read no exist" do
+    post = LocalFilesystem.read_post("no_exist.md")
+    assert post == "enoent"
   end
 end
