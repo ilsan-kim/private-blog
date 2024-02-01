@@ -50,11 +50,12 @@ defmodule Blog.Storage.LocalFilesystem do
 
   If the `:limit` is greater than the number of available posts, it will return as many as available.
   """
-  def read_posts(%{limit: limit}) do
+  def read_posts(%{limit: limit, offset: offset}) do
     posts = list_posts()
     len_posts = length(posts)
 
     posts
+    |> Enum.drop(offset)
     |> Enum.take(min(limit, len_posts))
     |> Enum.map(fn file -> %{file_name: file, content: read_post(file)} end)
   end

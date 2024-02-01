@@ -244,10 +244,10 @@ body {
 header {
     background: linear-gradient(
         to right,
-        #195099 40%,
-        #f6fafa 40%,
-        #f6fafa 60%,
-        #e71f27 60%
+        #195099 25%,
+        #f6fafa 25%,
+        #f6fafa 75%,
+        #e71f27 75%
     );
     color: white;
     padding: 10px 0;
@@ -347,6 +347,7 @@ nav ul li a:hover {
     grid-gap: 20px;
     max-width: 800px;
     margin: auto;
+    margin-top: 19px;
 }
 
 .posts-post {
@@ -400,4 +401,30 @@ nav ul li a:hover {
         width: 100%;
         height: auto;
     }
+}
+
+/* pageination */
+.pagination {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #f4f4f4;
+}
+
+.pagination-arrow {
+    /* 화살표 버튼에 대한 추가 스타일 */
+}
+
+.pagination-page {
+    /* 페이지 번호 버튼에 대한 추가 스타일 */
 }
