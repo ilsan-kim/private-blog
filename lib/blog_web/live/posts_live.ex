@@ -16,12 +16,16 @@ defmodule BlogWeb.PostsLive do
 
     options = %{limit: limit, offset: offset}
     posts = get_posts(options)
+    pages = pages(options, LocalFilesystem.count_posts())
+
+    IO.inspect(pages)
 
     socket =
       assign(
         socket,
         posts: posts,
-        options: options
+        options: options,
+        pages: pages
       )
 
     {:noreply, socket}
@@ -39,6 +43,32 @@ defmodule BlogWeb.PostsLive do
       <img src={@post.thumbnail} alt={"#{@post.subject}_thumbnail"} class="posts-image" />
     </div>
     """
+  end
+
+  defp pages(options, total_count) do
+    total_page_count = div(total_count + options.limit - 1, options.limit)
+    current_page = div(options.offset, options.limit) + 1
+    has_more_page = current_page < total_page_count
+
+    start_page = max(current_page - 2, 1)
+    end_page = min(current_page + 2, total_page_count)
+
+    pages = pages_recursive(start_page, end_page, current_page, [])
+
+    %{
+      pages: pages,
+      has_more_page: has_more_page
+    }
+  end
+
+  defp pages_recursive(current_page, end_page, target_page, acc) when current_page <= end_page do
+    current_page? = current_page == target_page
+
+    pages_recursive(current_page + 1, end_page, target_page, [{current_page, current_page?} | acc])
+  end
+
+  defp pages_recursive(_current_page, _end_page, _target_page, acc) do
+    Enum.reverse(acc)
   end
 
   defp post_at(posts, idx) do

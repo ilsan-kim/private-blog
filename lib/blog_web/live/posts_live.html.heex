@@ -5,3 +5,29 @@
   <% end %>
   <!-- 추가 행 -->
 </div>
+<div class="pagination">
+  <.link
+    :if={@options.offset >= @options.limit}
+    patch={~p"/posts?#{%{@options | offset: @options.offset - @options.limit}}"}
+    class="pagination-arrow"
+  >
+    &#8592; Prev
+  </.link>
+
+  <%= for {page_number, current?} <- @pages.pages do %>
+    <.link
+      patch={~p"/posts?#{%{@options | offset: page_number * @options.limit - @options.limit}}"}
+      class={"#{if current?, do: "pagination-active", else: "pagination-else"}"}
+    >
+      <%= page_number %>
+    </.link>
+  <% end %>
+
+  <.link
+    :if={@pages.has_more_page}
+    patch={~p"/posts?#{%{@options | offset: @options.offset + @options.limit}}"}
+    class="pagination-arrow"
+  >
+    Next &#8594;
+  </.link>
+</div>
