@@ -18,8 +18,6 @@ defmodule BlogWeb.PostsLive do
     posts = get_posts(options)
     pages = pages(options, LocalFilesystem.count_posts())
 
-    IO.inspect(pages)
-
     socket =
       assign(
         socket,
