@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"time"
 )
@@ -14,7 +13,7 @@ var ErrNotFile = errors.New("not a file")
 
 type FileWatcher struct {
 	path        string
-	prev        []File
+	prev        []DiffItem
 	diffHandler DiffHandler
 }
 
@@ -25,56 +24,53 @@ type File struct {
 }
 
 func NewFileWatcher(path string) FileWatcher {
-	// TODO path, postService 외부 주입
-	return FileWatcher{path: path, prev: nil}
+	// TODO path 외부 주입
+	return FileWatcher{path: path, prev: nil, diffHandler: PostDiffHandler{}}
 }
 
-func (f FileWatcher) Watch(stop context.CancelFunc) error {
-	files, err := f.listDirectory()
+func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
+	// TODO : sleep threshold 컨피그로 빼기
+	defer time.Sleep(2 * time.Second)
+
+	var err error
+	infos, err := f.getDiffItems()
+	log.Printf("prev > %d, now > %d\n", len(f.prev), len(infos))
 	if err != nil {
-		// TODO stop 할때 기본 정보를 백업해야함 (prev 정보)
 		stop()
-		return err
+		return f
 	}
 
-	// TODO 이거 컨피그로
-	time.Sleep(2 * time.Second)
-	log.Println(len(files), " watching")
-	return nil
-}
-
-func (f FileWatcher) handleDiff() {
-	// TODO: implement
-}
-
-func (f FileWatcher) gracefullyStop(stop context.CancelFunc) {
-	// TODO: implement
-}
-
-func (f FileWatcher) getFileMetas() ([]File, error) {
-	var res []File
-
-	entries, err := f.listDirectory()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, e := range entries {
-		f, err := f.getFileMeta(e)
-		if err != nil {
-			return nil, err
+	if len(f.prev) == 0 {
+		// 첫 검사
+		f.prev = infos
+		return f
+	} else {
+		// 첫 검사 이후
+		diffs := f.diffHandler.FindDiff(f.prev, infos)
+		if len(diffs) > 0 {
+			log.Println("diff found!!!!!!!!!!!!")
+			log.Println(diffs)
+			stop()
+			return f
 		}
-		// for debugging
-		log.Println(f.Name)
-		log.Println(f.Content[0:int(math.Min(30, float64(len(f.Content))))])
-		log.Println(f.CreatedTime)
 
-		log.Println("=====")
-
-		res = append(res, f)
+		f.prev, err = f.getDiffItems()
+		if err != nil {
+			// TODO stop 할때 기본 정보를 백업해야함 (prev 정보)
+			stop()
+			return f
+		}
 	}
 
-	return res, nil
+	return f
+}
+
+func (f FileWatcher) getDiffItem(filePath string) (DiffItem, error) {
+	path := fmt.Sprintf("%s/%s", f.path, filePath)
+
+	// TODO: diffMode 의 상수화
+	diffItem, err := NewDiffItem("CONTENT", path)
+	return diffItem, err
 }
 
 func (f FileWatcher) listDirectory() ([]os.DirEntry, error) {
@@ -86,26 +82,38 @@ func (f FileWatcher) listDirectory() ([]os.DirEntry, error) {
 	return entries, nil
 }
 
-func (f FileWatcher) getFileMeta(file os.DirEntry) (File, error) {
-	res := File{}
-	if file.IsDir() {
-		// Nested Directory ..
-		return res, ErrNotFile
-	}
+func (f FileWatcher) getDiffItems() ([]DiffItem, error) {
+	res := make([]DiffItem, 0)
 
-	res.Name = file.Name()
-
-	info, err := file.Info()
+	files, err := f.listDirectory()
 	if err != nil {
-		return res, err
+		log.Printf("can not list files in directory %s\n", f.path)
+		return nil, err
 	}
-	res.CreatedTime = info.ModTime()
 
-	content, err := os.ReadFile(fmt.Sprintf("%s/%s", f.path, res.Name))
-	if err != nil {
-		return res, err
+	for _, file := range files {
+		postDiffItem, err := f.getDiffItem(file.Name())
+		if err != nil {
+			log.Printf("can not initialize FileContentDiffItem for %s\n", file.Name())
+			continue
+		}
+
+		res = append(res, postDiffItem)
 	}
-	res.Content = string(content)
 
 	return res, nil
+}
+
+func (f FileWatcher) handleDiff() error {
+	now, err := f.getDiffItems()
+	if err != nil {
+		return err
+	}
+
+	f.diffHandler.FindDiff(f.prev, now)
+	return nil
+}
+
+func (f FileWatcher) gracefullyStop(stop context.CancelFunc) {
+	// TODO: implement
 }

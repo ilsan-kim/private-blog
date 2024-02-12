@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ilsan-kim/private-blog/worker/config"
 	watcher2 "github.com/ilsan-kim/private-blog/worker/watcher"
 	"log"
 	"os/signal"
@@ -10,7 +11,9 @@ import (
 )
 
 func main() {
-	worker := 2
+	config.UseJsonLogger()
+
+	worker := 1
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -41,11 +44,7 @@ func work(ctx context.Context, stop context.CancelFunc, w watcher2.Watcher) {
 			log.Println("work done")
 			return
 		default:
-			err := w.Watch(stop)
-			if err != nil {
-				log.Println(err)
-				return
-			}
+			w = w.Watch(stop)
 		}
 	}
 }
