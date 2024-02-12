@@ -29,7 +29,6 @@ func shortCallerHook() zerolog.HookFunc {
 	}
 }
 
-// 표준 log 패키지를 json 형식으로 출력하도록 설정한다.
 func UseJsonLogger() {
 	log.SetFlags(0)
 	log.SetOutput(Json)

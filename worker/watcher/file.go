@@ -2,19 +2,19 @@ package watcher
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"github.com/ilsan-kim/private-blog/worker/internal/post"
+	"github.com/ilsan-kim/private-blog/worker/pkg"
 	"log"
 	"os"
 	"time"
 )
 
-var ErrNotFile = errors.New("not a file")
-
 type FileWatcher struct {
 	path        string
-	prev        []DiffItem
-	diffHandler DiffHandler
+	prev        []pkg.DiffItem
+	diffHandler pkg.DiffFinder
+	postService post.PostService
 }
 
 type File struct {
@@ -24,8 +24,13 @@ type File struct {
 }
 
 func NewFileWatcher(path string) FileWatcher {
+
 	// TODO path 외부 주입
-	return FileWatcher{path: path, prev: nil, diffHandler: PostDiffHandler{}}
+	return FileWatcher{
+		path:        path,
+		prev:        nil,
+		diffHandler: pkg.DiffHandler{},
+	}
 }
 
 func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
@@ -46,7 +51,7 @@ func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
 		return f
 	} else {
 		// 첫 검사 이후
-		diffs := f.diffHandler.FindDiff(f.prev, infos)
+		diffs := f.diffHandler.Find(f.prev, infos)
 		if len(diffs) > 0 {
 			log.Println("diff found!!!!!!!!!!!!")
 			log.Println(diffs)
@@ -65,11 +70,11 @@ func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
 	return f
 }
 
-func (f FileWatcher) getDiffItem(filePath string) (DiffItem, error) {
+func (f FileWatcher) getDiffItem(filePath string) (pkg.DiffItem, error) {
 	path := fmt.Sprintf("%s/%s", f.path, filePath)
 
 	// TODO: diffMode 의 상수화
-	diffItem, err := NewDiffItem("CONTENT", path)
+	diffItem, err := pkg.NewDiffItem("CONTENT", path)
 	return diffItem, err
 }
 
@@ -82,8 +87,8 @@ func (f FileWatcher) listDirectory() ([]os.DirEntry, error) {
 	return entries, nil
 }
 
-func (f FileWatcher) getDiffItems() ([]DiffItem, error) {
-	res := make([]DiffItem, 0)
+func (f FileWatcher) getDiffItems() ([]pkg.DiffItem, error) {
+	res := make([]pkg.DiffItem, 0)
 
 	files, err := f.listDirectory()
 	if err != nil {
@@ -110,7 +115,7 @@ func (f FileWatcher) handleDiff() error {
 		return err
 	}
 
-	f.diffHandler.FindDiff(f.prev, now)
+	f.diffHandler.Find(f.prev, now)
 	return nil
 }
 

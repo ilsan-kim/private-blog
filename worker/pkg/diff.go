@@ -1,9 +1,8 @@
-package watcher
+package pkg
 
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/ilsan-kim/private-blog/worker/internal"
 	"io"
 	"os"
 	"strconv"
@@ -129,16 +128,15 @@ func (i FileContentDiffItem) getHashedDateWith(f *os.File, sumWith []byte) (stri
 	return hash, nil
 }
 
-type DiffHandler interface {
-	FindDiff(prev, now []DiffItem) []DiffResult
-	Handle(diffs []DiffItem) error
+type DiffFinder interface {
+	Find(prev, now []DiffItem) []DiffResult
 }
 
-type PostDiffHandler struct {
-	postService internal.PostService
+type DiffHandler struct {
+	handleFunc func() error
 }
 
-func (h PostDiffHandler) FindDiff(prev, now []DiffItem) []DiffResult {
+func (h DiffHandler) Find(prev, now []DiffItem) []DiffResult {
 	var results []DiffResult
 
 	prevMap := make(map[string]DiffItem)
@@ -171,7 +169,6 @@ func (h PostDiffHandler) FindDiff(prev, now []DiffItem) []DiffResult {
 	return results
 }
 
-func (h PostDiffHandler) Handle(diffs []DiffItem) error {
-
-	return nil
+func (h DiffHandler) Handle() error {
+	return h.handleFunc()
 }
