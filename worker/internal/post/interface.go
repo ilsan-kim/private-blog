@@ -9,15 +9,21 @@ type PostMeta struct {
 	Thumbnail   string
 	FilePath    string
 	CreatedTime time.Time
+	UpdatedTime time.Time
 }
 
 type Service interface {
+	Insert(data PostMeta) error
+	Update(data PostMeta) error
+	Delete(id int) error
+	Get(id int) (PostMeta, error)
+	GetAll() ([]PostMeta, error)
 }
 
 type Repository interface {
 	Insert(data PostMeta) error
 	Update(data PostMeta) error
-	Delete(pkey int) error
-	Get(pkey int) PostMeta
-	GetAll() []PostMeta
+	Delete(id int) error
+	Get(id int) (PostMeta, error)
+	GetAll() ([]PostMeta, error)
 }

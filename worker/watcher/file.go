@@ -14,7 +14,7 @@ type FileWatcher struct {
 	path        string
 	prev        []pkg.DiffItem
 	diffHandler pkg.DiffFinder
-	postService post.PostService
+	postService post.Service
 }
 
 type File struct {
