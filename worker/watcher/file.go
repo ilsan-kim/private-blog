@@ -2,25 +2,18 @@ package watcher
 
 import (
 	"context"
-	"fmt"
+	"github.com/ilsan-kim/private-blog/worker/internal/model"
 	"github.com/ilsan-kim/private-blog/worker/internal/post"
 	"github.com/ilsan-kim/private-blog/worker/pkg"
 	"log"
-	"os"
 	"time"
 )
 
 type FileWatcher struct {
 	path        string
 	prev        []pkg.DiffItem
-	diffHandler pkg.DiffFinder
+	diffHandler pkg.FileDiffHandler
 	postService post.Service
-}
-
-type File struct {
-	Name        string
-	CreatedTime time.Time
-	Content     string
 }
 
 func NewFileWatcher(path string) FileWatcher {
@@ -29,7 +22,7 @@ func NewFileWatcher(path string) FileWatcher {
 	return FileWatcher{
 		path:        path,
 		prev:        nil,
-		diffHandler: pkg.DiffHandler{},
+		diffHandler: pkg.FileDiffHandler{DiffMode: "CONTENT", DirPath: path},
 	}
 }
 
@@ -38,87 +31,29 @@ func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
 	defer time.Sleep(2 * time.Second)
 
 	var err error
-	infos, err := f.getDiffItems()
-	log.Printf("prev > %d, now > %d\n", len(f.prev), len(infos))
+
+	f.diffHandler, err = f.diffHandler.HandleDiff(func(diffs []pkg.DiffResult) error {
+		for _, d := range diffs {
+			file := model.NewFile(f.path, d.Item.GetName())
+			p := model.PostMetaFromFile(file, "")
+			if d.Mark == pkg.DiffResultMarkAdded {
+				log.Printf("handle added file... %v\n", p)
+			} else if d.Mark == pkg.DiffResultMarkDeleted {
+				log.Printf("handle deleted file...%v\n", p)
+			} else if d.Mark == pkg.DiffResultMarkEdited {
+				p.UpdatedTime = time.Now()
+				log.Printf("handle updated file...%v\n", p)
+			}
+
+			log.Printf("%d: %s", d.Mark, d.Item.GetName())
+		}
+		return nil
+	})
+
 	if err != nil {
+		log.Println(err)
 		stop()
-		return f
-	}
-
-	if len(f.prev) == 0 {
-		// 첫 검사
-		f.prev = infos
-		return f
-	} else {
-		// 첫 검사 이후
-		diffs := f.diffHandler.Find(f.prev, infos)
-		if len(diffs) > 0 {
-			log.Println("diff found!!!!!!!!!!!!")
-			log.Println(diffs)
-			stop()
-			return f
-		}
-
-		f.prev, err = f.getDiffItems()
-		if err != nil {
-			// TODO stop 할때 기본 정보를 백업해야함 (prev 정보)
-			stop()
-			return f
-		}
 	}
 
 	return f
-}
-
-func (f FileWatcher) getDiffItem(filePath string) (pkg.DiffItem, error) {
-	path := fmt.Sprintf("%s/%s", f.path, filePath)
-
-	// TODO: diffMode 의 상수화
-	diffItem, err := pkg.NewDiffItem("CONTENT", path)
-	return diffItem, err
-}
-
-func (f FileWatcher) listDirectory() ([]os.DirEntry, error) {
-	entries, err := os.ReadDir(f.path)
-	if err != nil {
-		return nil, err
-	}
-
-	return entries, nil
-}
-
-func (f FileWatcher) getDiffItems() ([]pkg.DiffItem, error) {
-	res := make([]pkg.DiffItem, 0)
-
-	files, err := f.listDirectory()
-	if err != nil {
-		log.Printf("can not list files in directory %s\n", f.path)
-		return nil, err
-	}
-
-	for _, file := range files {
-		postDiffItem, err := f.getDiffItem(file.Name())
-		if err != nil {
-			log.Printf("can not initialize FileContentDiffItem for %s\n", file.Name())
-			continue
-		}
-
-		res = append(res, postDiffItem)
-	}
-
-	return res, nil
-}
-
-func (f FileWatcher) handleDiff() error {
-	now, err := f.getDiffItems()
-	if err != nil {
-		return err
-	}
-
-	f.diffHandler.Find(f.prev, now)
-	return nil
-}
-
-func (f FileWatcher) gracefullyStop(stop context.CancelFunc) {
-	// TODO: implement
 }

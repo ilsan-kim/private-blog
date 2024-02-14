@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -128,15 +129,52 @@ func (i FileContentDiffItem) getHashedDateWith(f *os.File, sumWith []byte) (stri
 	return hash, nil
 }
 
-type DiffFinder interface {
-	Find(prev, now []DiffItem) []DiffResult
+type FileDiffHandler struct {
+	DiffMode string
+	DirPath  string
+	prev     []DiffItem
 }
 
-type DiffHandler struct {
-	handleFunc func() error
+func (h FileDiffHandler) getDiffItem(filePath string) (DiffItem, error) {
+	path := fmt.Sprintf("%s/%s", h.DirPath, filePath)
+
+	// TODO: diffMode 의 상수화
+	diffItem, err := NewDiffItem(h.DiffMode, path)
+	return diffItem, err
 }
 
-func (h DiffHandler) Find(prev, now []DiffItem) []DiffResult {
+func (h FileDiffHandler) listDirectory() ([]os.DirEntry, error) {
+	entries, err := os.ReadDir(h.DirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return entries, nil
+}
+
+func (h FileDiffHandler) getItemsAsDiffItem() ([]DiffItem, error) {
+	res := make([]DiffItem, 0)
+
+	files, err := h.listDirectory()
+	if err != nil {
+		log.Printf("can not list files in directory %s\n", h.DirPath)
+		return nil, err
+	}
+
+	for _, file := range files {
+		postDiffItem, err := h.getDiffItem(file.Name())
+		if err != nil {
+			log.Printf("can not initialize FileContentDiffItem for %s\n", file.Name())
+			continue
+		}
+
+		res = append(res, postDiffItem)
+	}
+
+	return res, nil
+}
+
+func (h FileDiffHandler) find(prev, now []DiffItem) []DiffResult {
 	var results []DiffResult
 
 	prevMap := make(map[string]DiffItem)
@@ -169,6 +207,22 @@ func (h DiffHandler) Find(prev, now []DiffItem) []DiffResult {
 	return results
 }
 
-func (h DiffHandler) Handle() error {
-	return h.handleFunc()
+func (h FileDiffHandler) HandleDiff(handlerFunc func(diffs []DiffResult) error) (FileDiffHandler, error) {
+	var err error
+	infos, err := h.getItemsAsDiffItem()
+	log.Printf("prev > %d, now > %d\n", len(h.prev), len(infos))
+	if err != nil {
+		return h, err
+	}
+
+	diffs := h.find(h.prev, infos)
+	if len(diffs) > 0 {
+		err = handlerFunc(diffs)
+		if err != nil {
+			return h, err
+		}
+	}
+
+	h.prev, err = h.getItemsAsDiffItem()
+	return h, err
 }
