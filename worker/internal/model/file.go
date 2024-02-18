@@ -11,7 +11,7 @@ type File struct {
 	Content     string
 }
 
-func NewFile(dirPath, fileName string) File {
+func NewFile(dirPath, fileName string, createdTime time.Time) File {
 	return File{
 		Name:        fmt.Sprintf("%s/%s", dirPath, fileName),
 		CreatedTime: time.Now(),

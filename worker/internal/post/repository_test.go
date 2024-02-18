@@ -2,6 +2,7 @@ package post
 
 import (
 	"github.com/ilsan-kim/private-blog/worker/config"
+	"github.com/ilsan-kim/private-blog/worker/internal/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -41,7 +42,7 @@ func TestNewPGRepository(t *testing.T) {
 	defer teardown()
 
 	t.Run("insert / get / update / delete", func(t *testing.T) {
-		meta := PostMeta{
+		meta := model.PostMeta{
 			Subject:   "test",
 			Preview:   "test",
 			Thumbnail: "test",

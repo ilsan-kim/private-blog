@@ -2,6 +2,8 @@ package watcher
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/ilsan-kim/private-blog/worker/internal/model"
 	"github.com/ilsan-kim/private-blog/worker/internal/post"
 	"github.com/ilsan-kim/private-blog/worker/pkg"
@@ -9,20 +11,55 @@ import (
 	"time"
 )
 
+type FileHandler interface {
+	handle(meta model.PostMeta) error
+}
+
+func NewFileHandler(postService post.Service, mark int) (FileHandler, error) {
+	switch mark {
+	case pkg.DiffResultMarkAdded:
+		return FileAddHandler{postService}, nil
+	case pkg.DiffResultMarkEdited:
+		return FileEditHandler{postService}, nil
+	case pkg.DiffResultMarkDeleted:
+		return FileDeleteHandler{postService}, nil
+	default:
+		return nil, errors.New("undefined file handler")
+	}
+}
+
+type FileAddHandler struct{ service post.Service }
+type FileEditHandler struct{ service post.Service }
+type FileDeleteHandler struct{ service post.Service }
+
+func (h FileAddHandler) handle(post model.PostMeta) error {
+	log.Printf("handle add post %v\n", post)
+	return h.service.Insert(post)
+}
+
+func (h FileEditHandler) handle(post model.PostMeta) error {
+	log.Printf("handle edit post %v\n", post)
+	return h.service.Update(post.FilePath, post)
+}
+
+func (h FileDeleteHandler) handle(post model.PostMeta) error {
+	log.Printf("handle delete post %v\n", post)
+	return h.service.Delete(post.ID)
+}
+
 type FileWatcher struct {
 	path        string
-	prev        []pkg.DiffItem
 	diffHandler pkg.FileDiffHandler
 	postService post.Service
 }
 
-func NewFileWatcher(path string) FileWatcher {
+func NewFileWatcher(path string, postRepo post.Repository) FileWatcher {
 
 	// TODO path 외부 주입
 	return FileWatcher{
 		path:        path,
-		prev:        nil,
 		diffHandler: pkg.FileDiffHandler{DiffMode: "CONTENT", DirPath: path},
+		postService: post.NewBaseService(postRepo),
 	}
 }
 
@@ -34,18 +71,28 @@ func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
 
 	f.diffHandler, err = f.diffHandler.HandleDiff(func(diffs []pkg.DiffResult) error {
 		for _, d := range diffs {
-			file := model.NewFile(f.path, d.Item.GetName())
-			p := model.PostMetaFromFile(file, "")
-			if d.Mark == pkg.DiffResultMarkAdded {
-				log.Printf("handle added file... %v\n", p)
-			} else if d.Mark == pkg.DiffResultMarkDeleted {
-				log.Printf("handle deleted file...%v\n", p)
-			} else if d.Mark == pkg.DiffResultMarkEdited {
-				p.UpdatedTime = time.Now()
-				log.Printf("handle updated file...%v\n", p)
+			file := model.NewFile(f.path, d.Item.GetName(), d.Item.GetTime())
+			p, err := f.postService.GetByFilePath(file.Name)
+			if errors.Is(err, sql.ErrNoRows) {
+				err = nil
+				p = model.PostMetaFromFile(file, "")
+			}
+			if err != nil {
+				log.Println(err)
+				continue
 			}
 
-			log.Printf("%d: %s", d.Mark, d.Item.GetName())
+			handler, err := NewFileHandler(f.postService, d.Mark)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			err = handler.handle(p)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
 		}
 		return nil
 	})

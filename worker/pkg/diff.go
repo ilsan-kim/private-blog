@@ -25,6 +25,7 @@ type DiffItem interface {
 	EqualTo(compare DiffItem) bool
 	GetValue() string
 	GetName() string
+	GetTime() time.Time
 }
 
 func NewDiffItem(diffMode string, filePath string) (DiffItem, error) {
@@ -42,11 +43,26 @@ func NewDiffItem(diffMode string, filePath string) (DiffItem, error) {
 }
 
 type FileNameDiffItem struct {
-	fileName string
+	fileName    string
+	createdTime time.Time
 }
 
 func NewFileNameDIffItem(fileName string) FileNameDiffItem {
-	return FileNameDiffItem{fileName: fileName}
+	res := FileNameDiffItem{fileName: fileName}
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Println(err)
+		return res
+	}
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		log.Println(err)
+		return res
+	}
+
+	res.createdTime = fileInfo.ModTime()
+	return res
 }
 
 func (f FileNameDiffItem) EqualTo(compare DiffItem) bool {
@@ -61,16 +77,32 @@ func (f FileNameDiffItem) GetName() string {
 	return f.fileName
 }
 
+func (f FileNameDiffItem) GetTime() time.Time {
+	return f.createdTime
+}
+
 type FileContentDiffItem struct {
-	filePath string
-	data     string
+	filePath    string
+	data        string
+	createdTime time.Time
 }
 
 func NewFileContentDiffItem(filePath string) (FileContentDiffItem, error) {
 	item := FileContentDiffItem{filePath: filePath}
-	hash, err := item.hash()
+	file, err := os.Open(filePath)
+	if err != nil {
+		return FileContentDiffItem{}, err
+	}
+	defer file.Close()
+
+	hash, err := item.hash(file)
 	if err != nil {
 		return item, err
+	}
+
+	item.createdTime, err = item.getModTime(file)
+	if err != nil {
+		log.Println("can not get createdTime for ", file)
 	}
 
 	item.data = hash
@@ -90,36 +122,42 @@ func (i FileContentDiffItem) GetName() string {
 	return i.filePath
 }
 
-func (i FileContentDiffItem) hash() (string, error) {
-	file, err := os.Open(i.filePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
+func (i FileContentDiffItem) GetTime() time.Time {
+	return i.createdTime
+}
 
-	modTime, err := i.getModTimeStr(file)
+func (i FileContentDiffItem) hash(f *os.File) (string, error) {
+	modTime, err := i.getModTimeStr(f)
 	if err != nil {
 		return "", err
 	}
 
-	hash, err := i.getHashedDateWith(file, []byte(modTime))
+	hash, err := i.getHashedDataWith(f, []byte(modTime))
 	if err != nil {
 		return "", err
 	}
 	return hash, nil
 }
 
-func (i FileContentDiffItem) getModTimeStr(f *os.File) (string, error) {
+func (i FileContentDiffItem) getModTime(f *os.File) (time.Time, error) {
 	info, err := f.Stat()
+	if err != nil {
+		return time.Time{}, err
+	}
+	return info.ModTime(), err
+}
+
+func (i FileContentDiffItem) getModTimeStr(f *os.File) (string, error) {
+	modTime, err := i.getModTime(f)
 	if err != nil {
 		return "", err
 	}
 
-	modTime := info.ModTime().Round(time.Second).Unix()
-	return strconv.FormatInt(modTime, 10), nil
+	modTimeInt := modTime.Round(time.Second).Unix()
+	return strconv.FormatInt(modTimeInt, 10), nil
 }
 
-func (i FileContentDiffItem) getHashedDateWith(f *os.File, sumWith []byte) (string, error) {
+func (i FileContentDiffItem) getHashedDataWith(f *os.File, sumWith []byte) (string, error) {
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, f); err != nil {
 		return "", err

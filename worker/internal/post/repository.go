@@ -28,9 +28,9 @@ func (r PGRepository) Insert(data model.PostMeta) error {
 	return err
 }
 
-func (r PGRepository) Update(data model.PostMeta) error {
+func (r PGRepository) Update(id int, data model.PostMeta) error {
 	_, err := r.db.Exec("update posts set subject = $1, preview = $2, thumbnail = $3, file_path = $4, updated_at = now() where id = $5",
-		data.Subject, data.Preview, data.Thumbnail, data.FilePath, data.ID)
+		data.Subject, data.Preview, data.Thumbnail, data.FilePath, id)
 	return err
 }
 
@@ -39,9 +39,9 @@ func (r PGRepository) Delete(id int) error {
 	return err
 }
 
-func (r PGRepository) Get(id int) (model.PostMeta, error) {
+func (r PGRepository) GetByFilePath(filePath string) (model.PostMeta, error) {
 	res := model.PostMeta{}
-	err := r.db.QueryRow("select id, subject, preview, thumbnail, file_path, inserted_at, updated_at from posts where id = $1", id).Scan(
+	err := r.db.QueryRow("select id, subject, preview, thumbnail, file_path, inserted_at, updated_at from posts where file_path = $1", filePath).Scan(
 		&res.ID, &res.Subject, &res.Preview, &res.Thumbnail, &res.FilePath, &res.CreatedTime, &res.UpdatedTime)
 	return res, err
 }

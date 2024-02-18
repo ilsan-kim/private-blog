@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/ilsan-kim/private-blog/worker/config"
+	"github.com/ilsan-kim/private-blog/worker/internal/post"
 	watcher2 "github.com/ilsan-kim/private-blog/worker/watcher"
 	"log"
 	"os/signal"
@@ -13,15 +14,25 @@ import (
 func main() {
 	config.UseJsonLogger()
 
+	// TODO: config
+	dbConf := config.DBConfig{
+		Host:     "localhost",
+		User:     "postgres",
+		Password: "postgres",
+		DB:       "blog_dev",
+	}
+
 	worker := 1
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	var wg sync.WaitGroup
-
 	var w watcher2.Watcher
-	w = watcher2.NewFileWatcher("md/posts")
+
+	postRepo := post.NewPGRepository(dbConf)
+
+	w = watcher2.NewFileWatcher("md/posts", postRepo)
 
 	for i := 0; i < worker; i++ {
 		wg.Add(1)
