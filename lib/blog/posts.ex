@@ -8,6 +8,33 @@ defmodule Blog.Posts do
 
   alias Blog.Posts.Post
 
+  def posts_count do
+    Repo.aggregate(Post, :count, :id)
+  end
+
+  def sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
+    order_by(query, {^sort_order, ^sort_by})
+  end
+
+  def sort(query, _options), do: query
+
+  def paginate(query, %{offset: offset, limit: limit}) when offset >= 0 and limit >= 0 do
+    IO.inspect(offset)
+    IO.inspect(limit)
+
+    query
+    |> limit(^limit)
+    |> offset(^offset)
+  end
+
+  def paginate(query, _options) do
+    IO.inspect("hihihi")
+
+    query
+    |> limit(12)
+    |> offset(0)
+  end
+
   @doc """
   Returns the list of posts.
 
@@ -18,7 +45,24 @@ defmodule Blog.Posts do
 
   """
   def list_posts do
-    Repo.all(Post)
+    Repo.all(from p in Post, order_by: [asc: p.id])
+  end
+
+  @doc """
+  Returns the list of posts with params %{sort_by: sort_by, sort_order: sort_order, offset: offset, limit: limit}
+
+  ## Examples
+
+      iex> list_posts(%{sort_by: "id", sort_order: :asc, offset: 0, limit: 10})
+      [%Post{}, ...]
+  """
+  def list_posts(options) when is_map(options) do
+    IO.inspect(options)
+
+    from(Post)
+    |> sort(options)
+    |> paginate(options)
+    |> Repo.all()
   end
 
   @doc """

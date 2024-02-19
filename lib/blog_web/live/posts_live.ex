@@ -16,7 +16,7 @@ defmodule BlogWeb.PostsLive do
 
     options = %{limit: limit, offset: offset}
     posts = get_posts(options)
-    pages = pages(options, LocalFilesystem.count_posts())
+    pages = pages(options, Blog.Posts.posts_count())
 
     socket =
       assign(
@@ -77,11 +77,17 @@ defmodule BlogWeb.PostsLive do
     })
   end
 
-  defp get_posts(%{limit: limit, offset: offset}) do
-    LocalFilesystem.read_posts(%{limit: limit, offset: offset})
-    |> Enum.map(fn post ->
-      %{subject: post.file_name, content: post.content, thumbnail: @default_thumbnail}
-    end)
+  def get_posts(%{limit: limit, offset: offset}) do
+    Blog.Posts.list_posts(%{sort_by: :updated_at, sort_order: :desc, limit: limit, offset: offset})
+    |> Enum.map(&format_post/1)
+  end
+
+  defp format_post(%{thumbnail: ""} = post) do
+    %{subject: post.subject, content: post.preview, thumbnail: @default_thumbnail}
+  end
+
+  defp format_post(post) do
+    %{subject: post.subject, content: post.preview, thumbnail: post.thumbnail}
   end
 
   defp param_to_integer(nil, default), do: default
