@@ -21,6 +21,8 @@ defmodule BlogWeb.Router do
     live "/md", BlogLive
     live "/profile", ProfileLive
     live "/posts", PostsLive
+
+    get "/:file_path", FileController, :serve_file
   end
 
   # Other scopes may use custom stacks.
