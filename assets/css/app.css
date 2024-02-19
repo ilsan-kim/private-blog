@@ -43,7 +43,7 @@ pre[class*="language-"] {
     padding: 1px;
 }
 
-pre[class*="language-"]>code {
+pre[class*="language-"] > code {
     position: relative;
     z-index: 1;
     border-left: 10px solid #358ccb;
@@ -51,8 +51,10 @@ pre[class*="language-"]>code {
         -1px 0px 0px 0px #358ccb,
         0px 0px 0px 1px #dfdfdf;
     background-color: #fdfdfd;
-    background-image: linear-gradient(transparent 50%,
-            rgba(69, 142, 209, 0.04) 50%);
+    background-image: linear-gradient(
+        transparent 50%,
+        rgba(69, 142, 209, 0.04) 50%
+    );
     background-size: 3em 3em;
     background-origin: content-box;
     background-attachment: local;
@@ -67,7 +69,7 @@ code[class*="language-"] {
 }
 
 /* Margin bottom to accommodate shadow */
-:not(pre)>code[class*="language-"],
+:not(pre) > code[class*="language-"],
 pre[class*="language-"] {
     background-color: #fdfdfd;
     -webkit-box-sizing: border-box;
@@ -77,7 +79,7 @@ pre[class*="language-"] {
 }
 
 /* Inline code */
-:not(pre)>code[class*="language-"] {
+:not(pre) > code[class*="language-"] {
     position: relative;
     padding: 0.2em;
     border-radius: 0.3em;
@@ -195,7 +197,6 @@ pre[class*="language-"]:after {
 }
 
 @media screen and (max-width: 767px) {
-
     pre[class*="language-"]:before,
     pre[class*="language-"]:after {
         bottom: 14px;
@@ -241,11 +242,13 @@ body {
 }
 
 header {
-    background: linear-gradient(to right,
-            #195099 25%,
-            #f6fafa 25%,
-            #f6fafa 75%,
-            #e71f27 75%);
+    background: linear-gradient(
+        to right,
+        #195099 25%,
+        #f6fafa 25%,
+        #f6fafa 75%,
+        #e71f27 75%
+    );
     color: white;
     padding: 10px 0;
 }
@@ -297,10 +300,12 @@ nav ul li a:hover {
     right: -5px;
     bottom: -5px;
     left: -5px;
-    background: linear-gradient(145deg,
-            #195099 15%,
-            #c3c6c8 15% 85%,
-            #e71f27 85%);
+    background: linear-gradient(
+        145deg,
+        #195099 15%,
+        #c3c6c8 15% 85%,
+        #e71f27 85%
+    );
     z-index: -1;
 }
 
@@ -326,8 +331,7 @@ nav ul li a:hover {
 }
 
 .profile-content img {
-    width: 225;
-    height: 400;
+    width: 500px;
 }
 
 @media screen and (max-width: 768px) {
@@ -432,16 +436,22 @@ nav ul li a:hover {
 .pagination-active {
     margin: 0 5px;
     padding: 5px 10px;
-    border: 2px solid transparent color: #333;
+    border: 2px solid transparent;
+    color: #333;
     text-decoration: none;
-    background-image: linear-gradient(to right,
-            #195099 10%,
-            #f6fafa 10%,
-            #f6fafa 90%,
-            #e71f27 90%);
-    border-image: linear-gradient(145deg,
+    background-image: linear-gradient(
+        to right,
+        #195099 10%,
+        #f6fafa 10%,
+        #f6fafa 90%,
+        #e71f27 90%
+    );
+    border-image: linear-gradient(
+            145deg,
             #195099 33%,
             #f6fafa 33%,
             #f6fafa 66%,
-            #e71f27 66%) 1 stretch;
+            #e71f27 66%
+        )
+        1 stretch;
 }
