@@ -24,10 +24,14 @@ defmodule Blog.Storage.LocalFilesystem do
 
   Raises `Atom.to_string(reason)` if there's an error.
   """
-  def read!(file_path) when is_binary(file_path) do
+  defp read!(file_path) when is_binary(file_path) do
     case File.read(file_path) do
-      {:ok, binary} -> binary
-      {:error, reason} -> Atom.to_string(reason)
+      {:ok, binary} ->
+        binary
+        |> sanitaze()
+
+      {:error, reason} ->
+        Atom.to_string(reason)
     end
   end
 
@@ -127,5 +131,9 @@ defmodule Blog.Storage.LocalFilesystem do
         Logger.warning("failed on File.ls call.. #{reason}")
         0
     end
+  end
+
+  defp sanitaze(string) do
+    String.replace(string, "\t", "    ")
   end
 end
