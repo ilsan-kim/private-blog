@@ -1,8 +1,6 @@
 defmodule BlogWeb.PostsLive do
   use BlogWeb, :live_view
 
-  alias Blog.Storage.LocalFilesystem
-
   @default_thumbnail "https://elixir-lang.org/images/logo/logo.png"
 
   # 어차피 mount 직후 handle_params 가 호출되기 때문에 여기서 posts를 조회할 필요가 없음
@@ -34,7 +32,11 @@ defmodule BlogWeb.PostsLive do
   def post_row(assigns) do
     ~H"""
     <div class="posts-post">
-      <h2><%= @post.subject %></h2>
+      <h2>
+        <.link patch={~p"/posts/#{@post.id}"} class="link-text">
+          <%= @post.subject %>
+        </.link>
+      </h2>
       <p>
         <%= raw(@post.content) %>
       </p>
@@ -71,23 +73,24 @@ defmodule BlogWeb.PostsLive do
 
   defp post_at(posts, idx) do
     Enum.at(posts, idx, %{
+      id: 0,
       subject: "No Posts",
       content: "No Posts",
       thumbnail: @default_thumbnail
     })
   end
 
-  def get_posts(%{limit: limit, offset: offset}) do
+  defp get_posts(%{limit: limit, offset: offset}) do
     Blog.Posts.list_posts(%{sort_by: :updated_at, sort_order: :desc, limit: limit, offset: offset})
     |> Enum.map(&format_post/1)
   end
 
   defp format_post(%{thumbnail: ""} = post) do
-    %{subject: post.subject, content: post.preview, thumbnail: @default_thumbnail}
+    %{id: post.id, subject: post.subject, content: post.preview, thumbnail: @default_thumbnail}
   end
 
   defp format_post(post) do
-    %{subject: post.subject, content: post.preview, thumbnail: post.thumbnail}
+    %{id: post.id, subject: post.subject, content: post.preview, thumbnail: post.thumbnail}
   end
 
   defp param_to_integer(nil, default), do: default

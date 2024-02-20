@@ -22,6 +22,8 @@ defmodule BlogWeb.Router do
     live "/profile", ProfileLive
     live "/posts", PostsLive
 
+    live "/posts/:id", PostLive
+
     get "/:file_path", FileController, :serve_file
   end
 
