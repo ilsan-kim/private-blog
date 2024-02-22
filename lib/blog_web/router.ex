@@ -17,9 +17,9 @@ defmodule BlogWeb.Router do
   scope "/", BlogWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
     live "/md", BlogLive
     live "/profile", ProfileLive
+    live "/", PostsLive
     live "/posts", PostsLive
 
     live "/posts/:id", PostLive

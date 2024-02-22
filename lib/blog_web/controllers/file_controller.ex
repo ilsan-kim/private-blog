@@ -7,7 +7,7 @@ defmodule BlogWeb.FileController do
     if File.exists?(file) do
       send_file(conn, 200, file)
     else
-      send_resp(conn, 404, "File not found")
+      redirect(conn, to: "/")
     end
   end
 end

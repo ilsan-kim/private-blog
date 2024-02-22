@@ -3,7 +3,6 @@
 @import "tailwindcss/utilities"; */
 
 /* This file is for your main application CSS */
-@import url("https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&family=Nanum+Gothic+Coding&display=swap")
 body {
     margin: 0;
     padding: 0;
@@ -46,7 +45,7 @@ nav ul li a:hover {
 
 .profile-content-container {
     line-height: 135%;
-    font-family: "Dongle";
+    font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -263,7 +262,7 @@ nav ul li a:hover {
     margin-left: 25%;
     margin-right: 25%;
 
-    font-family: "Nanum Gothic Coding", monospace;
+    font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
     font-optical-sizing: auto;
     font-weight: <weight>;
     font-style: normal;
@@ -293,7 +292,7 @@ nav ul li a:hover {
 }
 
 .posts-content body {
-    font-family: "Nanum Gothic Coding", monospace;
+    font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
     line-height: 1.6;
     padding: 20px;
     max-width: 800px;
@@ -353,7 +352,7 @@ ol {
     padding: 2px 4px;
     border-radius: 4px;
     font-size: 11px;
-    font-family: "Nanum Gothic Coding", monospace;
+    font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
 }
 
 .posts-content blockquote {
@@ -391,7 +390,7 @@ code[class*="language-"],
 pre[class*="language-"] {
     color: black;
     background: none;
-    font-family: monospace;
+    font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
     font-size: 12px;
     text-align: left;
     white-space: pre;

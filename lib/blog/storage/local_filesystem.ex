@@ -5,7 +5,6 @@ defmodule Blog.Storage.LocalFilesystem do
   @profile_file_path Application.compile_env(:blog, :profile_file_path)
   @posts_dir_path Application.compile_env(:blog, :posts_dir_path)
 
-  @impl true
   @doc """
   Reads the content of a file specified by the `file_path`.
 
