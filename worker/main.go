@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"github.com/ilsan-kim/private-blog/worker/config"
 	"github.com/ilsan-kim/private-blog/worker/internal/post"
 	watcher2 "github.com/ilsan-kim/private-blog/worker/watcher"
@@ -12,15 +13,14 @@ import (
 )
 
 func main() {
+	configPath := flag.String("c", "./config.json", "config path")
+	flag.Parse()
+
+	conf := config.MustLoadConfig(*configPath)
 	config.UseJsonLogger()
 
-	// TODO: config
-	dbConf := config.DBConfig{
-		Host:     "localhost",
-		User:     "postgres",
-		Password: "postgres",
-		DB:       "blog_dev",
-	}
+	dbConf := conf.DbConfig
+	path := conf.FileWatcherPath
 
 	worker := 1
 
@@ -32,7 +32,7 @@ func main() {
 
 	postRepo := post.NewPGRepository(dbConf)
 
-	w = watcher2.NewFileWatcher("md/posts", postRepo)
+	w = watcher2.NewFileWatcher(path, postRepo)
 
 	for i := 0; i < worker; i++ {
 		wg.Add(1)

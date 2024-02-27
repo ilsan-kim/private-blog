@@ -1,0 +1,9 @@
+{
+  "db_config": {
+    "host": "localhost",
+    "user": "postgres",
+    "password": "postgres",
+    "db": "blog_dev"
+  },
+  "file_watcher_path": "md/posts"
+}
