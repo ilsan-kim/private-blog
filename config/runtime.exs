@@ -21,8 +21,6 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  IO.inspect("hello!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
@@ -65,6 +63,7 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    server: true,
     secret_key_base: secret_key_base
 
   # ## SSL Support
