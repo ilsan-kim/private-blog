@@ -5,24 +5,6 @@ defmodule Blog.Storage.LocalFilesystem do
   @profile_file_path Application.compile_env(:blog, :profile_file_path)
   @posts_dir_path Application.compile_env(:blog, :posts_dir_path)
 
-  @doc """
-  Reads the content of a file specified by the `file_path`.
-
-  ## Parameters
-
-  - `file_path`: The path to the file that will be read.
-
-  ## Returns
-
-  The content of the file as a binary string.
-
-  ## Examples
-
-      iex> Blog.Storage.LocalFilesystem.read!("path/to/file")
-      "File content as string"
-
-  Raises `Atom.to_string(reason)` if there's an error.
-  """
   defp read!(file_path) when is_binary(file_path) do
     case File.read(file_path) do
       {:ok, binary} ->

@@ -18,3 +18,20 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
+
+profile_file_path =
+  System.get_env("PROFILE_FILE_PATH") ||
+    raise """
+    environment variable PROFILE_FILE_PATH is missing.
+    """
+
+posts_dir_path =
+  System.get_env("POSTS_DIR_PATH") ||
+    raise """
+    environment variable POSTS_DIR_PATH is missing
+    """
+
+# Custom Config
+config :blog,
+  profile_file_path: profile_file_path,
+  posts_dir_path: posts_dir_path
