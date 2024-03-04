@@ -14,6 +14,6 @@ type File struct {
 func NewFile(dirPath, fileName string, createdTime time.Time) File {
 	return File{
 		Name:        fmt.Sprintf("%s/%s", dirPath, fileName),
-		CreatedTime: time.Now(),
+		CreatedTime: createdTime,
 	}
 }

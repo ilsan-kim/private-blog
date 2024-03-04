@@ -40,7 +40,11 @@ defmodule BlogWeb.PostsLive do
       <p>
         <%= raw(@post.content) %>
       </p>
-      <img src={@post.thumbnail} alt={"#{@post.subject}_thumbnail"} class="posts-image" />
+      <img
+        src={"http://localhost:8080/static/#{@post.thumbnail}"}
+        alt={"#{@post.subject}_thumbnail"}
+        class="posts-image"
+      />
     </div>
     """
   end
