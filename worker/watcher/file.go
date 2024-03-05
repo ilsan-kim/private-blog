@@ -39,7 +39,7 @@ func (h FileAddHandler) handle(post model.PostMeta) error {
 
 func (h FileEditHandler) handle(post model.PostMeta) error {
 	log.Printf("handle edit post %v\n", post)
-	return h.service.Update(post.FilePath, post)
+	return h.service.Update(post.Subject, post)
 }
 
 func (h FileDeleteHandler) handle(post model.PostMeta) error {
@@ -71,7 +71,7 @@ func (f FileWatcher) Watch(stop context.CancelFunc) Watcher {
 
 	f.diffHandler, err = f.diffHandler.HandleDiff(func(diffs []pkg.DiffResult) error {
 		for _, d := range diffs {
-			file := model.NewFile(f.path, d.Item.GetName(), d.Item.GetTime())
+			file := model.NewFile(d.Item.GetName(), d.Item.GetTime())
 			p, err := f.postService.GetByFilePath(file.Name)
 			if errors.Is(err, sql.ErrNoRows) {
 				err = nil

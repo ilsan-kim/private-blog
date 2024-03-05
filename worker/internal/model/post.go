@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"strings"
@@ -12,8 +11,6 @@ type PostMeta struct {
 	ID          int
 	Subject     string
 	Preview     string
-	Thumbnail   string
-	FilePath    string
 	CreatedTime time.Time
 	UpdatedTime time.Time
 }
@@ -34,8 +31,6 @@ func PostMetaFromFile(file File, preview string) PostMeta {
 
 	res.Subject = fns[lastIdx]
 	res.Preview = preview
-	res.FilePath = file.Name
-	res.Thumbnail = fmt.Sprintf("%s.png", res.FilePath)
 	res.CreatedTime = ct
 
 	return res

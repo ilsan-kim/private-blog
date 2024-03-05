@@ -23,14 +23,14 @@ func NewPGRepository(dbConfig config.DBConfig) *PGRepository {
 }
 
 func (r PGRepository) Insert(data model.PostMeta) error {
-	_, err := r.db.Exec("insert into posts (subject, preview, thumbnail, file_path, inserted_at, updated_at) values ($1, $2, $3, $4, now(), now())",
-		data.Subject, data.Preview, data.Thumbnail, data.FilePath)
+	_, err := r.db.Exec("insert into posts (subject, preview, inserted_at, updated_at) values ($1, $2, now(), now())",
+		data.Subject, data.Preview)
 	return err
 }
 
 func (r PGRepository) Update(id int, data model.PostMeta) error {
-	_, err := r.db.Exec("update posts set subject = $1, preview = $2, thumbnail = $3, file_path = $4, updated_at = now() where id = $5",
-		data.Subject, data.Preview, data.Thumbnail, data.FilePath, id)
+	_, err := r.db.Exec("update posts set subject = $1, preview = $2, updated_at = now() where id = $5",
+		data.Subject, data.Preview, id)
 	return err
 }
 
@@ -39,23 +39,23 @@ func (r PGRepository) Delete(id int) error {
 	return err
 }
 
-func (r PGRepository) GetByFilePath(filePath string) (model.PostMeta, error) {
+func (r PGRepository) GetBySubject(subject string) (model.PostMeta, error) {
 	res := model.PostMeta{}
-	err := r.db.QueryRow("select id, subject, preview, thumbnail, file_path, inserted_at, updated_at from posts where file_path = $1", filePath).Scan(
-		&res.ID, &res.Subject, &res.Preview, &res.Thumbnail, &res.FilePath, &res.CreatedTime, &res.UpdatedTime)
+	err := r.db.QueryRow("select id, subject, preview, inserted_at, updated_at from posts where subject = $1", subject).Scan(
+		&res.ID, &res.Subject, &res.Preview, &res.CreatedTime, &res.UpdatedTime)
 	return res, err
 }
 
 func (r PGRepository) GetAll() ([]model.PostMeta, error) {
 	var res []model.PostMeta
-	rows, err := r.db.Query("select id, subject, preview, thumbnail, file_path, inserted_at, updated_at from posts")
+	rows, err := r.db.Query("select id, subject, preview, inserted_at, updated_at from posts")
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
 		r := model.PostMeta{}
-		err = rows.Scan(&r.ID, &r.Subject, &r.Preview, &r.Thumbnail, &r.FilePath, &r.CreatedTime, &r.UpdatedTime)
+		err = rows.Scan(&r.ID, &r.Subject, &r.Preview, &r.CreatedTime, &r.UpdatedTime)
 		if err != nil {
 			return nil, err
 		}

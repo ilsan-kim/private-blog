@@ -6,7 +6,7 @@ import (
 
 type Service interface {
 	Insert(data model.PostMeta) error
-	Update(filePath string, data model.PostMeta) error
+	Update(subject string, data model.PostMeta) error
 	Delete(id int) error
 	GetByFilePath(filePath string) (model.PostMeta, error)
 	GetAll() ([]model.PostMeta, error)
@@ -16,6 +16,6 @@ type Repository interface {
 	Insert(data model.PostMeta) error
 	Update(id int, data model.PostMeta) error
 	Delete(id int) error
-	GetByFilePath(filePath string) (model.PostMeta, error)
+	GetBySubject(filePath string) (model.PostMeta, error)
 	GetAll() ([]model.PostMeta, error)
 }

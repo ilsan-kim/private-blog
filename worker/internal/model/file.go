@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -11,9 +10,9 @@ type File struct {
 	Content     string
 }
 
-func NewFile(dirPath, fileName string, createdTime time.Time) File {
+func NewFile(fileName string, createdTime time.Time) File {
 	return File{
-		Name:        fmt.Sprintf("%s/%s", dirPath, fileName),
+		Name:        fileName,
 		CreatedTime: createdTime,
 	}
 }

@@ -14,8 +14,8 @@ func (b BaseService) Insert(data model.PostMeta) error {
 	return b.repo.Insert(data)
 }
 
-func (b BaseService) Update(filePath string, data model.PostMeta) error {
-	post, err := b.repo.GetByFilePath(filePath)
+func (b BaseService) Update(subject string, data model.PostMeta) error {
+	post, err := b.repo.GetBySubject(subject)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (b BaseService) Delete(id int) error {
 }
 
 func (b BaseService) GetByFilePath(filePath string) (model.PostMeta, error) {
-	return b.repo.GetByFilePath(filePath)
+	return b.repo.GetBySubject(filePath)
 }
 
 func (b BaseService) GetAll() ([]model.PostMeta, error) {
