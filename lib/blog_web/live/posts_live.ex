@@ -2,6 +2,7 @@ defmodule BlogWeb.PostsLive do
   use BlogWeb, :live_view
 
   @default_thumbnail "https://elixir-lang.org/images/logo/logo.png"
+  @thumbnail_dir_path Application.compile_env(:blog, :thumbnail_dir_path)
 
   # 어차피 mount 직후 handle_params 가 호출되기 때문에 여기서 posts를 조회할 필요가 없음
   def mount(_params, _seesion, socket) do
@@ -40,11 +41,7 @@ defmodule BlogWeb.PostsLive do
       <p>
         <%= raw(@post.content) %>
       </p>
-      <img
-        src={"http://localhost:8080/static/#{@post.thumbnail}"}
-        alt={"#{@post.subject}_thumbnail"}
-        class="posts-image"
-      />
+      <img src={"#{@post.thumbnail}"} alt={"#{@post.subject}_thumbnail"} class="posts-image" />
     </div>
     """
   end
@@ -94,7 +91,12 @@ defmodule BlogWeb.PostsLive do
   end
 
   defp format_post(post) do
-    %{id: post.id, subject: post.subject, content: post.preview, thumbnail: post.thumbnail}
+    %{
+      id: post.id,
+      subject: post.subject,
+      content: post.preview,
+      thumbnail: thumbnail_path(post.subject)
+    }
   end
 
   defp param_to_integer(nil, default), do: default
@@ -104,5 +106,9 @@ defmodule BlogWeb.PostsLive do
       {number, _} -> number
       :error -> default
     end
+  end
+
+  defp thumbnail_path(subject) do
+    "#{@thumbnail_dir_path}#{subject}_thumbnail"
   end
 end

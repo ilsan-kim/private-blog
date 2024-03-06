@@ -31,7 +31,14 @@ posts_dir_path =
     environment variable POSTS_DIR_PATH is missing
     """
 
+thumbnail_dir_path =
+  System.get_env("THUMBNAIL_DIR_PATH") ||
+    raise """
+    environment variable THUMBNAIL_DIR_PATH is missing
+    """
+
 # Custom Config
 config :blog,
   profile_file_path: profile_file_path,
-  posts_dir_path: posts_dir_path
+  posts_dir_path: posts_dir_path,
+  thumbnail_dir_path: thumbnail_dir_path

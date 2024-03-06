@@ -5,8 +5,6 @@ defmodule Blog.Posts.Post do
   schema "posts" do
     field :subject, :string
     field :preview, :string
-    field :thumbnail, :string
-    field :file_path, :string
 
     timestamps(type: :utc_datetime)
   end
