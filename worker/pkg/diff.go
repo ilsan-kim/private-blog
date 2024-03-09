@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -119,7 +120,8 @@ func (i FileContentDiffItem) GetValue() string {
 }
 
 func (i FileContentDiffItem) GetName() string {
-	return i.filePath
+	paths := strings.Split(i.filePath, "/")
+	return paths[len(paths)-1]
 }
 
 func (i FileContentDiffItem) GetTime() time.Time {
