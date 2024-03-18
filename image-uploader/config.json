@@ -1,5 +1,5 @@
 {
   "md_file_upload_path": "md/posts",
   "thumbnail_upload_path": "md/statics",
-  "image_upload_from": ["123.124.124.12"]
+  "image_upload_from": ["*"]
 }

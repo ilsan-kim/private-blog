@@ -109,6 +109,11 @@ func ipBlockMiddleware(next http.HandlerFunc, allowedIPs []string) http.HandlerF
 		pass := false
 
 		for _, allowedIP := range allowedIPs {
+			if allowedIP == "*" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			if clientIP == allowedIP {
 				pass = true
 			}
@@ -120,5 +125,6 @@ func ipBlockMiddleware(next http.HandlerFunc, allowedIPs []string) http.HandlerF
 		}
 
 		next.ServeHTTP(w, r)
+		return
 	}
 }
