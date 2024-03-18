@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func uploadFileHandler(config config.Config) http.HandlerFunc {
@@ -94,9 +95,30 @@ func main() {
 	log.Println(*configPath)
 	conf := config.MustLoadConfig(*configPath)
 
-	http.Handle("/", uploadFileHandler(conf))
+	http.Handle("/", ipBlockMiddleware(uploadFileHandler(conf), conf.ImageUploadFrom))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(conf.ThumbnailUploadPath))))
 
 	fmt.Println("Server started at http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
+}
+
+func ipBlockMiddleware(next http.HandlerFunc, allowedIPs []string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ip := r.Header.Get("X-Forwarded-For")
+		clientIP := strings.Split(ip, ",")[0]
+		pass := false
+
+		for _, allowedIP := range allowedIPs {
+			if clientIP == allowedIP {
+				pass = true
+			}
+		}
+
+		if !pass {
+			http.Error(w, "Access Denied", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
 }

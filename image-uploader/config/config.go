@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	MDFileUploadPath    string `json:"md_file_upload_path"`
-	ThumbnailUploadPath string `json:"thumbnail_upload_path"`
+	MDFileUploadPath    string   `json:"md_file_upload_path"`
+	ThumbnailUploadPath string   `json:"thumbnail_upload_path"`
+	ImageUploadFrom     []string `json:"image_upload_from"`
 }
 
 func MustLoadConfig(configPath string) Config {
