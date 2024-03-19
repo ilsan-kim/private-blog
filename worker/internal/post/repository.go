@@ -29,7 +29,7 @@ func (r PGRepository) Insert(data model.PostMeta) error {
 }
 
 func (r PGRepository) Update(id int, data model.PostMeta) error {
-	_, err := r.db.Exec("update posts set subject = $1, preview = $2, updated_at = now() where id = $5",
+	_, err := r.db.Exec("update posts set subject = $1, preview = $2, updated_at = now() where id = $3",
 		data.Subject, data.Preview, id)
 	return err
 }
