@@ -175,21 +175,23 @@ nav ul li a:hover {
     color: #808080;
 }
 
-.posts-post p {
+/* .posts-post p {
+    font-size: 1em;
     margin: 0;
     flex-grow: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 3;
-    /* 최대 3줄 표시 */
     -webkit-box-orient: vertical;
-}
+} */
 
-.posts-image {
-    width: 280px;
-    height: 210px;
-    margin-left: 20px;
+.posts-post .post-updated-at {
+    right: 10px; /* 오른쪽 정렬 */
+    bottom: 10px; /* 아래쪽 정렬 */
+    font-size: 0.8em; /* 텍스트 크기 조정 */
+    color: #808080; /* 텍스트 색상 */
+    margin: 0; /* 기본 여백 제거 */
 }
 
 /* 모바일 환경 대응 */
@@ -373,6 +375,35 @@ ol {
 
 .posts-content img {
     max-width: 100%;
+}
+
+.posts-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.posts-content th,
+.posts-content td {
+    text-align: left;
+    padding: 6px;
+    border: 1px solid #ddd;
+}
+
+.posts-content th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-size: 13px;
+}
+
+.posts-content tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.posts-content tr:hover {
+    background-color: #f1f1f1;
 }
 
 @media screen and (max-width: 768px) {
