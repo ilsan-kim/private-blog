@@ -1,9 +1,6 @@
 defmodule BlogWeb.PostsLive do
   use BlogWeb, :live_view
 
-  @default_thumbnail "https://elixir-lang.org/images/logo/logo.png"
-  @thumbnail_dir_path Application.compile_env(:blog, :thumbnail_dir_path)
-
   # 어차피 mount 직후 handle_params 가 호출되기 때문에 여기서 posts를 조회할 필요가 없음
   def mount(_params, _seesion, socket) do
     {:ok, socket, temporary_assigns: [posts: []]}
@@ -38,10 +35,9 @@ defmodule BlogWeb.PostsLive do
           <%= @post.subject %>
         </.link>
       </h2>
-      <p>
-        <%= raw(@post.content) %>
+      <p class="post-updated-at">
+        <%= @post.updated_at %>
       </p>
-      <img src={"#{@post.thumbnail}"} alt={"#{@post.subject}_thumbnail"} class="posts-image" />
     </div>
     """
   end
@@ -75,9 +71,7 @@ defmodule BlogWeb.PostsLive do
   defp post_at(posts, idx) do
     Enum.at(posts, idx, %{
       id: 0,
-      subject: "No Posts",
-      content: "No Posts",
-      thumbnail: @default_thumbnail
+      subject: "No Posts"
     })
   end
 
@@ -87,15 +81,14 @@ defmodule BlogWeb.PostsLive do
   end
 
   defp format_post(%{thumbnail: ""} = post) do
-    %{id: post.id, subject: post.subject, content: post.preview, thumbnail: @default_thumbnail}
+    %{id: post.id, subject: post.subject, updated_at: post.updated_at}
   end
 
   defp format_post(post) do
     %{
       id: post.id,
       subject: post.subject,
-      content: post.preview,
-      thumbnail: thumbnail_path(post.subject)
+      updated_at: post.updated_at
     }
   end
 
@@ -106,9 +99,5 @@ defmodule BlogWeb.PostsLive do
       {number, _} -> number
       :error -> default
     end
-  end
-
-  defp thumbnail_path(subject) do
-    "#{@thumbnail_dir_path}#{subject}_thumbnail"
   end
 end
