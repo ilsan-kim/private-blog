@@ -28,8 +28,6 @@ defmodule Blog.Posts do
   end
 
   def paginate(query, _options) do
-    IO.inspect("hihihi")
-
     query
     |> limit(12)
     |> offset(0)
@@ -57,8 +55,6 @@ defmodule Blog.Posts do
       [%Post{}, ...]
   """
   def list_posts(options) when is_map(options) do
-    IO.inspect(options)
-
     from(Post)
     |> sort(options)
     |> paginate(options)

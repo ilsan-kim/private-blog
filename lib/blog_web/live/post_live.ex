@@ -11,6 +11,7 @@ defmodule BlogWeb.PostLive do
     IO.inspect(self(), label: "HANDLE PARAMS ID=#{id}")
 
     post = Posts.get_post!(id)
+    subject = Path.basename(post.subject, ".md")
 
     md =
       LocalFilesystem.read_post(post.subject)
@@ -22,7 +23,13 @@ defmodule BlogWeb.PostLive do
         inner_html: true
       })
 
-    socket = assign(socket, markdown: md)
+    socket =
+      assign(socket,
+        markdown: md,
+        subject: subject,
+        page_title: subject
+      )
+
     {:noreply, socket}
   end
 end

@@ -80,14 +80,10 @@ defmodule BlogWeb.PostsLive do
     |> Enum.map(&format_post/1)
   end
 
-  defp format_post(%{thumbnail: ""} = post) do
-    %{id: post.id, subject: post.subject, updated_at: post.updated_at}
-  end
-
   defp format_post(post) do
     %{
       id: post.id,
-      subject: post.subject,
+      subject: Path.basename(post.subject, ".md"),
       updated_at: post.updated_at
     }
   end
