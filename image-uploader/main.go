@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/ilsan-kim/private-blog/image-uploader/config"
 	"io"
 	"log"
@@ -19,8 +20,8 @@ func uploadFileHandler(config config.Config) http.HandlerFunc {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`
                 <form action="/upload" method="post" enctype="multipart/form-data">
-                    thumbnail: <input type="file" name="uploadfile"> </br>
-					md: <input type="file" name="mdfile"> </br>
+                    Image: <input type="file" name="imageFile"> </br>
+                    MD: <input type="file" name="mdfile"> </br>
                     <input type="submit" value="Upload">
                 </form>
             `))
@@ -28,63 +29,50 @@ func uploadFileHandler(config config.Config) http.HandlerFunc {
 		}
 
 		if r.Method == "POST" {
-			// Parse the multipart form, 10 << 20 specifies a maximum
-			// upload of 10 MB files.
-			r.ParseMultipartForm(10 << 20)
+			// Parse the multipart form
+			r.ParseMultipartForm(10 << 20) // 10 MB
 
-			file, handler, err := r.FormFile("uploadfile")
-			if err != nil {
-				fmt.Println("Error Retrieving the File")
-				fmt.Println(err)
-				return
-			}
-			defer file.Close()
-
+			// Handle MD file upload
 			mdfile, mdHandler, err := r.FormFile("mdfile")
-			if err != nil {
-				fmt.Println("Error Retrieving the File")
-				fmt.Println(err)
-				return
-			}
-			defer file.Close()
+			if err == nil {
+				defer mdfile.Close()
 
-			mdContent, err := io.ReadAll(mdfile)
-			if err != nil {
-				return
-			}
-			fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-			fmt.Printf("Uploaded File: %+v\n", mdHandler.Filename)
-
-			// Create a new file in the static directory
-			dst, err := os.Create(filepath.Join(config.ThumbnailUploadPath, filepath.Base(fmt.Sprintf("%s_thumbnail", mdHandler.Filename))))
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			defer dst.Close()
-
-			// Copy the uploaded file to the created file on the filesystem
-			_, err = io.Copy(dst, file)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				// Save MD file
+				dstPath := filepath.Join(config.MDFileUploadPath, filepath.Base(mdHandler.Filename))
+				saveFile(mdfile, dstPath)
+				fmt.Printf("Uploaded MD File: %+v\n", mdHandler.Filename)
 			}
 
-			dst2, err := os.Create(filepath.Join(config.MDFileUploadPath, filepath.Base(mdHandler.Filename)))
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			defer dst2.Close()
+			// Handle Image file upload
+			imageFile, imageHandler, err := r.FormFile("imageFile")
+			if err == nil {
+				defer imageFile.Close()
 
-			_, err = dst2.Write(mdContent)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				// Generate UUID for image filename
+				newFilename := uuid.New().String() + filepath.Ext(imageHandler.Filename)
+
+				// Save image file
+				dstPath := filepath.Join(config.ThumbnailUploadPath, newFilename)
+				saveFile(imageFile, dstPath)
+				fmt.Printf("Uploaded Image File: %+v\n", newFilename)
 			}
 
-			fmt.Fprintf(w, "Successfully Uploaded File\n")
+			fmt.Fprintf(w, "Successfully Uploaded Files\n")
 		}
+	}
+}
+
+func saveFile(src io.Reader, dstPath string) {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		log.Printf("Error creating file %s: %v", dstPath, err)
+		return
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, src); err != nil {
+		log.Printf("Error saving file %s: %v", dstPath, err)
+		return
 	}
 }
 
