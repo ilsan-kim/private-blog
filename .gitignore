@@ -1,7 +1,9 @@
 /.idea/
 md/*
-image-uploader/config.json
-worker/config.json
+
+*.json
+*.out
+*.sh
 
 # The directory Mix will write compiled artifacts to.
 /_build/
