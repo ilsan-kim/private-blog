@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,6 +63,51 @@ func uploadFileHandler(config config.Config) http.HandlerFunc {
 	}
 }
 
+func fileListHandler(config config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			files, err := os.ReadDir(config.MDFileUploadPath)
+			if err != nil {
+				http.Error(w, "Unable to read the directory.", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.WriteHeader(http.StatusOK)
+
+			w.Write([]byte("<html><body>"))
+
+			w.Write([]byte("<ul>"))
+			for _, file := range files {
+				w.Write([]byte(fmt.Sprintf("<li>%s <form method='POST' action='/delete?filename=%s' style='display:inline;'><input type='submit' value='Delete'></form></li>", file.Name(), url.QueryEscape(file.Name()))))
+			}
+			w.Write([]byte("</ul>"))
+
+			w.Write([]byte("</body></html>"))
+		}
+	}
+}
+
+func fileDeleteHandler(config config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			filename := r.URL.Query().Get("filename")
+			if filename == "" {
+				http.Error(w, "Filename is required", http.StatusBadRequest)
+				return
+			}
+
+			filePath := filepath.Join(config.MDFileUploadPath, filename)
+			err := os.Remove(filePath)
+			if err != nil {
+				http.Error(w, "Failed to delete file", http.StatusInternalServerError)
+				return
+			}
+
+			http.Redirect(w, r, "/lists", http.StatusSeeOther)
+		}
+	}
+}
 func saveFile(src io.Reader, dstPath string) {
 	dst, err := os.Create(dstPath)
 	if err != nil {
@@ -85,6 +131,8 @@ func main() {
 
 	http.Handle("/", ipBlockMiddleware(uploadFileHandler(conf), conf.ImageUploadFrom))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(conf.ThumbnailUploadPath))))
+	http.Handle("/lists", ipBlockMiddleware(fileListHandler(conf), conf.ImageUploadFrom))
+	http.Handle("/delete", ipBlockMiddleware(fileDeleteHandler(conf), conf.ImageUploadFrom))
 
 	fmt.Println("Server started at http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
