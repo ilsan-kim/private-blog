@@ -84,7 +84,7 @@ defmodule BlogWeb.PostsLive do
     %{
       id: post.id,
       subject: Path.basename(post.subject, ".md"),
-      updated_at: post.updated_at
+      updated_at: Calendar.strftime(post.updated_at, "%Y-%m-%d")
     }
   end
 
