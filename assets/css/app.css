@@ -11,13 +11,11 @@ body {
 }
 
 header {
-    background: linear-gradient(
-        to right,
-        #195099 25%,
-        #f6fafa 25%,
-        #f6fafa 75%,
-        #e71f27 75%
-    );
+    background: linear-gradient(to right,
+            #195099 25%,
+            #f6fafa 25%,
+            #f6fafa 75%,
+            #e71f27 75%);
     color: white;
     padding: 10px 0;
 }
@@ -73,12 +71,10 @@ nav ul li a:hover {
     right: -5px;
     bottom: -5px;
     left: -5px;
-    background: linear-gradient(
-        145deg,
-        #195099 15%,
-        #c3c6c8 15% 85%,
-        #e71f27 85%
-    );
+    background: linear-gradient(145deg,
+            #195099 15%,
+            #c3c6c8 15% 85%,
+            #e71f27 85%);
     z-index: -1;
 }
 
@@ -111,6 +107,7 @@ nav ul li a:hover {
     .profile-content ul {
         padding-left: 20px;
     }
+
     .profile-content-container {
         padding: 0 10%;
     }
@@ -187,11 +184,16 @@ nav ul li a:hover {
 } */
 
 .posts-post .post-updated-at {
-    right: 10px; /* 오른쪽 정렬 */
-    bottom: 10px; /* 아래쪽 정렬 */
-    font-size: 0.8em; /* 텍스트 크기 조정 */
-    color: #808080; /* 텍스트 색상 */
-    margin: 0; /* 기본 여백 제거 */
+    right: 10px;
+    /* 오른쪽 정렬 */
+    bottom: 10px;
+    /* 아래쪽 정렬 */
+    font-size: 0.8em;
+    /* 텍스트 크기 조정 */
+    color: #808080;
+    /* 텍스트 색상 */
+    margin: 0;
+    /* 기본 여백 제거 */
 }
 
 /* 모바일 환경 대응 */
@@ -241,21 +243,16 @@ nav ul li a:hover {
     border: 2px solid transparent;
     color: #333;
     text-decoration: none;
-    background-image: linear-gradient(
-        to right,
-        #195099 10%,
-        #f6fafa 10%,
-        #f6fafa 90%,
-        #e71f27 90%
-    );
-    border-image: linear-gradient(
-            145deg,
+    background-image: linear-gradient(to right,
+            #195099 10%,
+            #f6fafa 10%,
+            #f6fafa 90%,
+            #e71f27 90%);
+    border-image: linear-gradient(145deg,
             #195099 33%,
             #f6fafa 33%,
             #f6fafa 66%,
-            #e71f27 66%
-        )
-        1 stretch;
+            #e71f27 66%) 1 stretch;
 }
 
 /* post-content */
@@ -284,12 +281,10 @@ nav ul li a:hover {
     right: -5px;
     bottom: -5px;
     left: -5px;
-    background: linear-gradient(
-        145deg,
-        #195099 15%,
-        #c3c6c8 15% 85%,
-        #e71f27 85%
-    );
+    background: linear-gradient(145deg,
+            #195099 15%,
+            #c3c6c8 15% 85%,
+            #e71f27 85%);
     z-index: -1;
 }
 
@@ -330,22 +325,25 @@ h6 {
 }
 
 .posts-content p,
-ul,
-ol,
 pre,
 blockquote {
+    font-size: 13px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
 .posts-content ul,
 ol {
+    font-size: 13px;
+    margin: 3px;
+    margin-top: 0px;
+    margin-bottom: 0px;
     padding-left: 20px;
 }
 
 .posts-content p code.inline {
     color: black;
-    font-size: 15px;
+    font-size: 13px;
     background: none;
 }
 
@@ -354,7 +352,7 @@ ol {
     background-color: #eee;
     padding: 2px 4px;
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 9px;
     font-family: "Noto Sans Mono", "Noto Sans KR", monospace;
 }
 
@@ -449,7 +447,7 @@ pre[class*="language-"] {
     padding: 1px;
 }
 
-pre[class*="language-"] > code {
+pre[class*="language-"]>code {
     padding-top: 4px;
     padding-bottom: 4px;
     position: relative;
@@ -459,10 +457,8 @@ pre[class*="language-"] > code {
         -1px 0px 0px 0px #358ccb,
         0px 0px 0px 1px #dfdfdf;
     background-color: #fdfdfd;
-    background-image: linear-gradient(
-        transparent 50%,
-        rgba(69, 142, 209, 0.04) 50%
-    );
+    background-image: linear-gradient(transparent 50%,
+            rgba(69, 142, 209, 0.04) 50%);
     background-size: 3em 3em;
     background-origin: content-box;
     background-attachment: local;
@@ -477,7 +473,7 @@ code[class*="language-"] {
 }
 
 /* Margin bottom to accommodate shadow */
-:not(pre) > code[class*="language-"],
+:not(pre)>code[class*="language-"],
 pre[class*="language-"] {
     background-color: #fdfdfd;
     -webkit-box-sizing: border-box;
@@ -487,7 +483,7 @@ pre[class*="language-"] {
 }
 
 /* Inline code */
-:not(pre) > code[class*="language-"] {
+:not(pre)>code[class*="language-"] {
     position: relative;
     padding: 0.2em;
     border-radius: 0.3em;
@@ -524,9 +520,12 @@ pre[class*="language-"]:after {
     -o-transform: rotate(2deg);
     transform: rotate(2deg);
 }
+
 pre[class^="language-"] code {
-    line-height: 1.5; /* 원하는 line-height 값 */
+    line-height: 1.5;
+    /* 원하는 line-height 값 */
 }
+
 .token.comment,
 .token.block-comment,
 .token.prolog,
@@ -607,6 +606,7 @@ pre[class^="language-"] code {
 }
 
 @media screen and (max-width: 767px) {
+
     pre[class*="language-"]:before,
     pre[class*="language-"]:after {
         bottom: 14px;
